@@ -1,0 +1,53 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visitor-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: visitor-web
+  template:
+    metadata:
+      labels:
+        app: visitor-web
+    spec:
+      containers:
+        - name: visitor-web
+          image: visitor-counter-kubernetes-web:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: visitor-web
+spec:
+  selector:
+    app: visitor-web
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: NodePort
