@@ -29,36 +29,38 @@ The main objective is to understand how containerized applications work in a dis
 ```text
 visitor-counter-kubernetes/
 │
-├── app/
-│   ├── app.py
-│   └── requirements.txt
+├── app/                                                            # Contains the Flask application
+│   ├── app.py                                                      # Main Python file; handles visitor counting
+│   └── requirements.txt                                            # Python dependencies (Flask, Redis, Gunicorn)
 │
-├── kubernetes/
-│   ├── app-deployment.yaml
-│   └── redis-deployment.yaml
+├── kubernetes/                                                     # Kubernetes deployment configuration files
+│   ├── app-deployment.yaml                                         # Deploys Flask app and exposes it through a Service
+│   ├── redis-deployment.yaml                                       # Deploys Redis and creates its internal Service
+│   └── hpa.yaml                                                    # Configures automatic pod scaling based on CPU usage
 │
-├── screenshots/
-│   ├── 01_minikube_cluster_setup.png
-│   ├── 02_kubernetes_system_pods.png
-│   ├── 03_docker_image_loaded.png
-│   ├── 04_redis_deployment_created.png
-│   ├── 05_redis_pod_verification.png
-│   ├── 06_kubernetes_deployments_running.png
-│   ├── 07_visitor_counter_application.png
-│   ├── 08_self_healing_initial_status.png
-│   ├── 09_self_healing_pod_deletion.png
-│   ├── 10_self_healing_pod_recreation.png
-│   ├── 11_hpa_configuration.png
-│   ├── 12_CPU_Load_Generation.png
-│   ├── 13_HPA_Scalling.png
-│   ├── 14_Scaled_Pods.png
-│   ├── 15_hpa_scaling_success.png
-│   └── 16_hpa_scale_down.png
+├── screenshots/                                                    # Evidence of project execution and testing
+│   ├── 01_minikube_cluster_setup.png  
+│   ├── 02_kubernetes_system_pods.png 
+│   ├── 03_docker_image_loaded.png    
+│   ├── 04_redis_deployment_created.png 
+│   ├── 05_redis_pod_verification.png 
+│   ├── 06_kubernetes_deployments_running.png 
+│   ├── 07_visitor_counter_application.png 
+│   ├── 08_self_healing_initial_status.png 
+│   ├── 09_self_healing_pod_deletion.png 
+│   ├── 10_self_healing_pod_recreation.png 
+│   ├── 11_hpa_configuration.png      
+│   ├── 12_CPU_Load_Generation.png    
+│   ├── 13_HPA_Scaling.png           
+│   ├── 14_Scaled_Pods.png            
+│   ├── 15_hpa_scaling_success.png   
+│   └── 16_hpa_scale_down.png        
 │
-├── .dockerignore
-├── docker-compose.yml
-├── Dockerfile
-└── readme.md
+├── .dockerignore                                                   # Excludes unnecessary files from Docker build context
+├── .gitignore                                                      # Prevents unwanted files from being uploaded to GitHub
+├── docker-compose.yml                                              # Runs Flask and Redis together using Docker Compose
+├── Dockerfile                                                      # Instructions for building the Flask Docker image
+└── README.md                                                       # Project overview, setup instructions and documentation
 ```
 
 ## 4. Application Architecture
@@ -416,7 +418,7 @@ The following screenshots provide evidence of the project's implementation and d
 |---|---|
 | ![HPA Configuration](screenshots/11_hpa_configuration.png) | Initial HPA configuration |
 | ![CPU Load Generation](screenshots/12_CPU_Load_Generation.png) | Generating application traffic |
-| ![HPA Scaling](screenshots/13_HPA_Scalling.png) | Monitoring HPA scaling activity |
+| ![HPA Scaling](screenshots/13_HPA_Scaling.png) | Monitoring HPA scaling activity |
 | ![Scaled Pods](screenshots/14_Scaled_Pods.png) | Application Pods after scaling |
 | ![HPA Scaling Success](screenshots/15_hpa_scaling_success.png) | Successful HPA scale-up |
 | ![HPA Scale Down](screenshots/16_hpa_scale_down.png) | Automatic scale-down after reducing load |
