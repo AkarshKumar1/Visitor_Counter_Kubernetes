@@ -2,7 +2,7 @@
 # Visitor Counter Web Application
 ### Docker • Kubernetes • HPA • Hybrid Failover • Resource Optimization
 
-> **Cloud Computing Internal Assessment Project**  
+> **Cloud Computing Class Project**  
 > A Flask-based visitor counter application deployed using Docker and Kubernetes, demonstrating containerization, self-healing, autoscaling, hybrid failover simulation, and resource optimization.
 
 ---
@@ -15,7 +15,7 @@ The application is developed using **Python Flask** and uses **Redis** to store 
 
 The project also includes a simulated hybrid environment using two local Kubernetes clusters to demonstrate failover, along with practical resource optimization techniques.
 
-Developed as part of a **Cloud Computing Internal Assessment**, this project provides hands-on experience with cloud-native application deployment, container orchestration, availability, scalability, and resource efficiency.
+Developed as part of a **Cloud Computing Class Project**, this project provides hands-on experience with cloud-native application deployment, container orchestration, availability, scalability, and resource efficiency.
 
 ---
 
@@ -226,7 +226,7 @@ The application was configured to scale based on CPU utilization.
 
 ### HPA Scaling Activity
 
-![HPA Scaling](screenshots/13_HPA_Scalling.png)
+![HPA Scaling](screenshots/13_HPA_Scaling.png)
 
 ### Scaled Pods
 
@@ -257,19 +257,19 @@ The secondary cluster was tested during the primary cluster failure simulation. 
 
 ### Primary Cluster Failure
 
-![Primary Cluster Failure](screenshots/23_primary_cluster_failure.png)
+![Primary Cluster Failure](screenshots/22_primary_cluster_failur.png)
 
 ### Secondary Cluster Status
 
-![Secondary Cluster Pods](screenshots/24_secondary_cluster_pods.png)
+![Secondary Cluster Pods](screenshots/23_secondary_cluster_pods_after_failover.png)
 
 ### Application Accessible After Failover
 
-![Secondary Application Failover](screenshots/25_secondary_app_after_failover.png)
+![Secondary Application Failover](screenshots/24_secondary_application_after_failover.png)
 
 ### Primary Cluster Restoration
 
-![Primary Cluster Restoration](screenshots/26_primary_cluster_restoration.png)
+![Primary Cluster Restoration](screenshots/25_primary_cluster_restoration.png)
 
 > This is a local failover simulation using Minikube clusters, not a deployment across real cloud providers or geographically distributed regions.
 
@@ -313,15 +313,15 @@ CPU and memory requests and limits were reduced in the optimized secondary deplo
 
 ### Optimized Secondary Cluster
 
-![Secondary Cluster Ready](screenshots/35_secondary_cluster_ready.png)
+![Secondary Cluster Ready](screenshots/34_secondary_cluster_ready.png)
 
 ### Optimized Deployment
 
-![Secondary Application Deployment](screenshots/36_secondary_application_deployed.png)
+![Secondary Application Deployment](screenshots/35_secondary_application_deployed.png)
 
 ### Optimized Application Running
 
-![Secondary Application Accessible](screenshots/37_secondary_application_accessible.png)
+![Secondary Application Accessible](screenshots/36_secondary_application_accessible.png)
 
 ---
 
