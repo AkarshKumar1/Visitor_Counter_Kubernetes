@@ -1,473 +1,601 @@
 
-# Visitor Counter Application using Docker and Kubernetes
+# Visitor Counter Web Application
+### Docker, Kubernetes, Autoscaling, Hybrid Failover & Resource Optimization
 
-## 1. Project Overview
+> **Cloud Computing Internal Assessment Project**  
+> A containerized visitor counter web application deployed using Docker and Kubernetes, with self-healing, Horizontal Pod Autoscaling (HPA), hybrid failover simulation, and resource optimization.
 
-The Visitor Counter Application is a containerized web application developed using Python Flask and Redis. It counts the total number of visits to a website and demonstrates how modern containerization and orchestration technologies can be used to deploy, manage, and scale applications.
+---
 
-The project uses Docker to containerize the application and Redis database, while Kubernetes manages application deployment, service discovery, self-healing, and automatic scaling.
+## 📌 Project Overview
 
-The main objective is to understand how containerized applications work in a distributed environment and how Kubernetes maintains application availability under changing workloads.
+This project demonstrates the deployment and management of a web application using containerization and Kubernetes orchestration.
 
-## 2. Technologies Used
+The application is built using **Python Flask** and uses **Redis** to store visitor counts. Docker is used to containerize the application, while Kubernetes manages application deployment, scaling, service discovery, and self-healing.
+
+The project also demonstrates a simulated hybrid environment using two local Kubernetes clusters, along with practical resource optimization techniques.
+
+This project was developed as part of a **Cloud Computing Internal Assessment** to gain hands-on experience with containerization, orchestration, scalability, availability, and resource efficiency.
+
+---
+
+## 🎯 Project Objectives
+
+- Containerize the Flask web application using Docker.
+- Run the application and Redis using Docker Compose.
+- Deploy the application on Kubernetes.
+- Implement Kubernetes self-healing.
+- Configure Horizontal Pod Autoscaling (HPA).
+- Simulate a primary and secondary Kubernetes environment.
+- Demonstrate application availability during primary cluster failure.
+- Optimize Docker image size.
+- Reduce Kubernetes CPU and memory resource requests and limits.
+- Compare resource utilization configurations before and after optimization.
+
+---
+
+## 🛠️ Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Backend programming language |
-| Flask | Web application framework |
-| Redis | In-memory database for storing visitor counts |
-| Docker | Application containerization |
-| Docker Compose | Multi-container management |
+| Python | Application programming language |
+| Flask | Lightweight web framework |
+| Redis | Visitor counter data storage |
+| Docker | Containerization |
+| Docker Compose | Local multi-container deployment |
 | Kubernetes | Container orchestration |
 | Minikube | Local Kubernetes cluster |
-| kubectl | Kubernetes command-line management |
-| Docker Desktop | Container runtime and management |
-| BusyBox | Temporary load-generation container |
+| kubectl | Kubernetes cluster management |
+| Metrics Server | CPU metrics for autoscaling |
+| HPA | Automatic scaling of application replicas |
 
-## 3. Project Structure
+---
+
+## 🏗️ Architecture
+
+The project consists of a primary Kubernetes cluster and a secondary Kubernetes cluster used to simulate a failover environment.
+
+### Primary Cluster
+
+- Flask application deployment
+- Redis deployment
+- NodePort service
+- Two initial Flask replicas
+- Horizontal Pod Autoscaler
+- Automatic pod recovery
+
+### Secondary Cluster
+
+- Flask application deployment
+- Redis deployment
+- Application service
+- Two Flask replicas
+- Optimized Docker image
+- Reduced CPU and memory configuration
+
+### Architecture Diagram
+
+![Visitor Counter Kubernetes Architecture](architecture_diagram.png)
+
+---
+
+## 📂 Project Structure
 
 ```text
 visitor-counter-kubernetes/
 │
-├── app/                                                            # Contains the Flask application
-│   ├── app.py                                                      # Main Python file; handles visitor counting
-│   └── requirements.txt                                            # Python dependencies (Flask, Redis, Gunicorn)
+├── app/
+│   ├── app.py
+│   └── requirements.txt
 │
-├── kubernetes/                                                     # Kubernetes deployment configuration files
-│   ├── app-deployment.yaml                                         # Deploys Flask app and exposes it through a Service
-│   ├── redis-deployment.yaml                                       # Deploys Redis and creates its internal Service
-│   └── hpa.yaml                                                    # Configures automatic pod scaling based on CPU usage
+├── kubernetes/
+│   ├── app-deployment.yaml
+│   └── redis-deployment.yaml
 │
-├── screenshots/                                                    # Evidence of project execution and testing
-│   ├── 01_minikube_cluster_setup.png  
-│   ├── 02_kubernetes_system_pods.png 
-│   ├── 03_docker_image_loaded.png    
-│   ├── 04_redis_deployment_created.png 
-│   ├── 05_redis_pod_verification.png 
-│   ├── 06_kubernetes_deployments_running.png 
-│   ├── 07_visitor_counter_application.png 
-│   ├── 08_self_healing_initial_status.png 
-│   ├── 09_self_healing_pod_deletion.png 
-│   ├── 10_self_healing_pod_recreation.png 
-│   ├── 11_hpa_configuration.png      
-│   ├── 12_CPU_Load_Generation.png    
-│   ├── 13_HPA_Scaling.png           
-│   ├── 14_Scaled_Pods.png            
-│   ├── 15_hpa_scaling_success.png   
-│   └── 16_hpa_scale_down.png        
+├── screenshots/
+│   ├── 01_minikube_cluster_setup.png
+│   ├── 02_kubernetes_system_pods.png
+│   ├── 03_docker_image_loaded.png
+│   ├── 04_redis_deployment_created.png
+│   ├── 05_redis_pod_verification.png
+│   ├── 06_kubernetes_deployments_running.png
+│   ├── 07_visitor_counter_application.png
+│   ├── 08_self_healing_initial_status.png
+│   ├── 09_self_healing_pod_deletion.png
+│   ├── 10_self_healing_pod_recreation.png
+│   ├── 11_hpa_configuration.png
+│   ├── 12_CPU_Load_Generation.png
+│   ├── 13_HPA_Scalling.png
+│   ├── 14_Scaled_Pods.png
+│   ├── 15_hpa_scaling_success.png
+│   ├── 16_hpa_scale_down.png
+│   └── ... additional hybrid failover
+│        and optimization screenshots
 │
-├── .dockerignore                                                   # Excludes unnecessary files from Docker build context
-├── .gitignore                                                      # Prevents unwanted files from being uploaded to GitHub
-├── docker-compose.yml                                              # Runs Flask and Redis together using Docker Compose
-├── Dockerfile                                                      # Instructions for building the Flask Docker image
-└── README.md                                                       # Project overview, setup instructions and documentation
+├── architecture_diagram.png
+├── Dockerfile
+├── docker-compose.yml
+├── k8s.yaml
+├── hpa.yaml
+├── .dockerignore
+├── .gitignore
+└── readme.md
 ```
 
-## 4. Application Architecture
+---
 
-The application consists of two primary services:
+## ⚙️ Application Features
 
-### Flask Web Application
+### 1. Visitor Counter
 
-Flask handles incoming HTTP requests, communicates with Redis, and displays the total number of website visits.
+A web application built using Flask that displays and updates the visitor count.
 
-### Redis Database
+Redis is used as the backend data store for maintaining the visitor counter.
 
-Redis stores the visitor count in memory and updates the count whenever a visitor accesses the application.
+### 2. Docker Containerization
 
-### Architecture Flow
+The application is packaged into a Docker image to ensure portability and consistent execution across environments.
 
-```text
-          User / Browser
-                |
-                v
-          Flask Web App
-           Port 5000
-                |
-                v
-             Redis
-           Port 6379
-                |
-                v
-        Visitor Count Storage
-```
+### 3. Kubernetes Deployment
 
-Docker Compose manages the application and Redis containers together. Kubernetes manages their deployment through Pods, Deployments, and Services.
+The application and Redis are deployed as Kubernetes workloads. Kubernetes manages the pods and services required to run the application.
 
-## 5. Running the Application Using Docker
+### 4. Self-Healing
 
-### Step 1: Build and start the containers
+Kubernetes automatically recreates application pods when a running pod is deleted or becomes unavailable, maintaining the desired replica count.
+
+### 5. Horizontal Pod Autoscaling
+
+The application automatically scales based on CPU utilization.
+
+- Minimum replicas: 2
+- Maximum replicas: 6
+- Target CPU utilization: 50%
+
+### 6. Hybrid Failover Simulation
+
+Two local Minikube Kubernetes clusters are used:
+
+- Primary cluster
+- Secondary cluster
+
+The secondary cluster was tested by stopping the primary cluster and verifying that the application remained accessible through the secondary environment.
+
+### 7. Resource Optimization
+
+The project includes:
+
+- Docker image size reduction
+- CPU request optimization
+- Memory request optimization
+- CPU limit optimization
+- Memory limit optimization
+- Dynamic replica scaling using HPA
+
+---
+
+# 🚀 Installation and Setup
+
+## Prerequisites
+
+Install the following tools:
+
+- Python
+- Docker Desktop
+- Docker Compose
+- kubectl
+- Minikube
+- Git
+
+Verify installations:
 
 ```bash
-docker compose up --build -d
+docker --version
+docker compose version
+kubectl version --client
+minikube version
+git --version
 ```
 
-### Step 2: Verify running containers
+---
+
+# 🐍 Run Locally
+
+Navigate to the application directory:
 
 ```bash
-docker compose ps
+cd app
 ```
 
-### Step 3: Check application logs
+Install Python dependencies:
 
 ```bash
-docker compose logs -f web
+pip install -r requirements.txt
 ```
 
-### Step 4: Access the application
+Run the Flask application:
 
-Open the following address in your browser:
-
-```text
-http://localhost:5000
+```bash
+python app.py
 ```
 
-### Step 5: Stop the containers
+---
+
+# 🐳 Docker Deployment
+
+Build the Docker image:
+
+```bash
+docker build -t visitor-counter-kubernetes-web:latest .
+```
+
+Check available images:
+
+```bash
+docker images
+```
+
+Run the application with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Stop containers:
 
 ```bash
 docker compose down
 ```
 
-## 6. Kubernetes Cluster Setup
+---
 
-Minikube is used to create a local Kubernetes cluster with Docker Desktop as the container driver.
+# ☸️ Kubernetes Deployment
 
-### Step 1: Start Minikube
+Start Minikube:
 
 ```bash
 minikube start --driver=docker
 ```
 
-### Step 2: Check Minikube status
+Check cluster status:
 
 ```bash
 minikube status
 ```
 
-### Step 3: Verify Kubernetes nodes
+Check Kubernetes nodes:
 
 ```bash
-kubectl get nodes -o wide
+kubectl get nodes
 ```
 
-### Step 4: Verify Kubernetes system Pods
+Check system pods:
 
 ```bash
-kubectl get pods -A
+kubectl get pods -n kube-system
 ```
 
-### Step 5: Enable Metrics Server
+---
 
-```bash
-minikube addons enable metrics-server
-```
+## Deploy Redis
 
-Verify node resource utilization:
-
-```bash
-kubectl top nodes
-```
-
-Verify Pod resource utilization:
-
-```bash
-kubectl top pods
-```
-
-## 7. Deploying the Application on Kubernetes
-
-### Step 1: Load the Docker image into Minikube
-
-```bash
-minikube image load visitor-counter-kubernetes-web:latest
-```
-
-### Step 2: Verify the loaded image
-
-```bash
-minikube image ls
-```
-
-### Step 3: Deploy Redis
+Apply the Redis configuration:
 
 ```bash
 kubectl apply -f kubernetes/redis-deployment.yaml
 ```
 
-### Step 4: Deploy the Flask application
+Verify Redis:
+
+```bash
+kubectl get pods
+kubectl get deployments
+kubectl get services
+```
+
+---
+
+## Deploy Flask Application
+
+Apply the application deployment:
 
 ```bash
 kubectl apply -f kubernetes/app-deployment.yaml
 ```
 
-### Step 5: Verify Kubernetes Deployments
+Verify application pods:
+
+```bash
+kubectl get pods
+```
+
+Verify deployments:
 
 ```bash
 kubectl get deployments
 ```
 
-### Step 6: Verify running Pods
-
-```bash
-kubectl get pods -o wide
-```
-
-### Step 7: Check Kubernetes Services
+Verify services:
 
 ```bash
 kubectl get services
 ```
 
-### Step 8: Access the application
+---
+
+## Access the Application
+
+Access the application through the Kubernetes service:
+
+```bash
+minikube service visitor-web
+```
+
+Or retrieve the service URL:
 
 ```bash
 minikube service visitor-web --url
 ```
 
-Open the generated URL in your browser to access the Visitor Counter Application.
+Open the generated URL in your browser to access the visitor counter.
 
-## 8. Kubernetes Self-Healing Demonstration
+---
 
-One of the important features demonstrated in this project is Kubernetes self-healing.
+# ♻️ Self-Healing Demonstration
 
-Kubernetes Deployments maintain the desired number of application replicas. If a Pod is deleted or fails, Kubernetes automatically creates a replacement Pod to maintain the desired state.
+Kubernetes self-healing was tested by manually deleting one of the running application pods.
 
-### Step 1: Check the initial deployment status
-
-```bash
-kubectl rollout status deployment/visitor-web
-```
-
-```bash
-kubectl get deployments
-```
+### Check running pods
 
 ```bash
 kubectl get pods
 ```
 
-**Observation:**
-
-The visitor-web Deployment was running successfully with two application replicas.
-
-### Step 2: Delete an application Pod
+### Delete one application pod
 
 ```bash
-kubectl delete pod <POD_NAME>
+kubectl delete pod <pod-name>
 ```
 
-Replace `<POD_NAME>` with the actual name of one visitor-web Pod.
-
-**Observation:**
-
-The selected application Pod was successfully deleted from the default namespace.
-
-### Step 3: Observe automatic Pod recreation
+### Observe automatic recovery
 
 ```bash
 kubectl get pods -w
 ```
 
-**Observation:**
+Kubernetes automatically creates a replacement pod to maintain the desired replica count defined in the deployment.
 
-Kubernetes automatically created a replacement Pod to maintain the desired replica count.
+---
 
-The newly created Pod eventually reached the Running and Ready state.
+# 📈 Horizontal Pod Autoscaling (HPA)
 
-### Result
+The application was configured to scale automatically based on CPU utilization.
 
-The self-healing demonstration was successful.
+### Enable Metrics Server
 
-Even after manually deleting an application Pod, Kubernetes automatically recreated it and maintained the desired number of replicas.
+```bash
+minikube addons enable metrics-server
+```
 
-## 9. Horizontal Pod Autoscaling (HPA)
-
-Horizontal Pod Autoscaling is a Kubernetes feature that automatically adjusts the number of running Pods based on resource utilization.
-
-In this project, CPU utilization is used as the scaling metric.
-
-### HPA Configuration
-
-| Parameter | Configuration |
-|---|---|
-| Deployment | visitor-web |
-| Minimum Replicas | 2 |
-| Maximum Replicas | 6 |
-| Target CPU Utilization | 50% |
-| Scaling Metric | CPU |
-
-### Step 1: Verify Metrics Server
+Verify resource metrics:
 
 ```bash
 kubectl top nodes
-```
-
-```bash
 kubectl top pods
 ```
 
-### Step 2: Configure Horizontal Pod Autoscaling
+### Configure HPA
 
 ```bash
-kubectl autoscale deployment visitor-web --cpu-percent=50 --min=2 --max=6
+kubectl autoscale deployment visitor-web \
+  --cpu-percent=50 \
+  --min=2 \
+  --max=6
 ```
 
-This command creates an HPA that maintains at least two replicas and can scale up to six replicas depending on CPU utilization.
-
-### Step 3: Verify HPA configuration
+Verify HPA:
 
 ```bash
 kubectl get hpa
 ```
 
-```bash
-kubectl describe hpa visitor-web
-```
+### Generate CPU Load
 
-### Step 4: Generate application load
+CPU load was generated inside the Kubernetes environment to test automatic scaling.
 
-A temporary BusyBox Pod is used to generate HTTP requests to the Flask application's health endpoint.
+During the test:
 
-```bash
-kubectl run load-generator --image=busybox:1.36 --restart=Never -- /bin/sh -c "while true; do wget -q -O- http://visitor-web:5000/health > /dev/null; done"
-```
+- The application initially ran with 2 replicas.
+- CPU utilization increased under generated load.
+- HPA scaled the application up to 6 replicas.
+- After the load was stopped, the replicas scaled back down to 2.
 
-### Step 5: Monitor CPU utilization and scaling
-
-Monitor the HPA:
+Monitor scaling:
 
 ```bash
-kubectl get hpa visitor-web --watch
+kubectl get hpa -w
 ```
 
-Monitor application Pods:
+Monitor pods:
 
 ```bash
-kubectl get pods --watch
+kubectl get pods -w
 ```
 
-Check resource utilization:
+---
 
-```bash
-kubectl top pods
-```
+# 🌐 Hybrid Cluster & Failover Simulation
 
-### Step 6: Observe automatic scale-up
+The project uses two local Kubernetes clusters to simulate a primary and secondary environment.
 
-When CPU utilization exceeds the configured target, Kubernetes increases the number of application replicas.
-
-During the demonstration, CPU utilization reached approximately 54%, exceeding the 50% target.
-
-The visitor-web Deployment scaled from two replicas to six replicas.
-
-### Step 7: Stop the load generator
-
-```bash
-kubectl delete pod load-generator --ignore-not-found
-```
-
-### Step 8: Observe automatic scale-down
-
-Monitor the HPA:
-
-```bash
-kubectl get hpa visitor-web --watch
-```
-
-Check the running Pods:
-
-```bash
-kubectl get pods
-```
-
-After the CPU load decreases, Kubernetes gradually reduces the number of replicas towards the configured minimum of two.
-
-### Result
-
-The Horizontal Pod Autoscaling demonstration successfully showed how Kubernetes automatically increases and decreases application replicas according to CPU utilization.
-
-The application scaled up to six replicas during increased load and returned to two replicas after the load was removed.
-
-## 10. Screenshots and Implementation Evidence
-
-The following screenshots provide evidence of the project's implementation and demonstrations.
-
-### Kubernetes Cluster Setup and Deployment
-
-| Screenshot | Description |
+| Environment | Role |
 |---|---|
-| ![Minikube Cluster Setup](screenshots/01_minikube_cluster_setup.png) | Minikube cluster initialization |
-| ![Kubernetes System Pods](screenshots/02_kubernetes_system_pods.png) | Kubernetes system Pods verification |
-| ![Docker Image Loaded](screenshots/03_docker_image_loaded.png) | Loading the Docker image into Minikube |
-| ![Redis Deployment Created](screenshots/04_redis_deployment_created.png) | Redis Deployment and Service creation |
-| ![Redis Pod Verification](screenshots/05_redis_pod_verification.png) | Redis Pod running successfully |
-| ![Kubernetes Deployments Running](screenshots/06_kubernetes_deployments_running.png) | Kubernetes Deployment verification |
-| ![Visitor Counter Application](screenshots/07_visitor_counter_application.png) | Running Visitor Counter web application |
+| Primary Cluster | Main application environment |
+| Secondary Cluster | Backup/failover environment |
 
-### Kubernetes Self-Healing
+### Failover Test Performed
 
-| Screenshot | Description |
+1. Deploy the application in the primary environment.
+2. Verify application accessibility.
+3. Stop the primary cluster.
+4. Verify that the secondary environment remains operational.
+5. Access the application through the secondary cluster.
+6. Restore the primary environment.
+
+The failover scenario was demonstrated successfully using two local Minikube environments.
+
+> **Note:** This is a local hybrid/failover simulation. The clusters are not deployed across separate cloud providers or geographically distributed infrastructure.
+
+---
+
+# 💰 Cost & Resource Optimization
+
+Three optimization techniques were demonstrated.
+
+## 1. Docker Image Optimization
+
+The original Docker image was optimized using a lightweight Alpine-based Python image and reduced image build overhead.
+
+| Before | After |
 |---|---|
-| ![Self Healing Initial Status](screenshots/08_self_healing_initial_status.png) | Initial application replica status |
-| ![Self Healing Pod Deletion](screenshots/09_self_healing_pod_deletion.png) | Manual deletion of an application Pod |
-| ![Self Healing Pod Recreation](screenshots/10_self_healing_pod_recreation.png) | Automatic replacement of the deleted Pod |
+| 53.65 MB | 21.74 MB |
 
-### Horizontal Pod Autoscaling
+**Image size reduction: approximately 59.5%.**
 
-| Screenshot | Description |
+---
+
+## 2. CPU & Memory Optimization
+
+Resource requests and limits were reduced in the optimized secondary deployment.
+
+| Resource | Before | After | Reduction |
+|---|---:|---:|---:|
+| CPU Request | 100m | 50m | 50% |
+| Memory Request | 128Mi | 64Mi | 50% |
+| CPU Limit | 500m | 250m | 50% |
+| Memory Limit | 256Mi | 128Mi | 50% |
+
+These changes reduce the configured resource allocation for the application containers.
+
+---
+
+## 3. Dynamic Scaling with HPA
+
+Instead of maintaining a fixed number of application replicas, HPA dynamically adjusts the replica count according to CPU demand.
+
+| Configuration | Value |
 |---|---|
-| ![HPA Configuration](screenshots/11_hpa_configuration.png) | Initial HPA configuration |
-| ![CPU Load Generation](screenshots/12_CPU_Load_Generation.png) | Generating application traffic |
-| ![HPA Scaling](screenshots/13_HPA_Scaling.png) | Monitoring HPA scaling activity |
-| ![Scaled Pods](screenshots/14_Scaled_Pods.png) | Application Pods after scaling |
-| ![HPA Scaling Success](screenshots/15_hpa_scaling_success.png) | Successful HPA scale-up |
-| ![HPA Scale Down](screenshots/16_hpa_scale_down.png) | Automatic scale-down after reducing load |
+| Minimum replicas | 2 |
+| Maximum replicas | 6 |
+| CPU target | 50% |
+| Scale-up observed | 2 → 6 |
+| Scale-down observed | 6 → 2 |
 
-## 11. Project Outcomes
+Dynamic scaling allows the application to use more replicas when demand increases and reduce replicas when demand decreases.
 
-The following outcomes were achieved during the project:
+### Optimization Summary
 
-- Developed a web-based Visitor Counter using Flask.
-- Integrated Redis to maintain visitor count data.
-- Containerized the application using Docker.
-- Managed multiple containers using Docker Compose.
-- Created and configured a local Kubernetes cluster using Minikube.
-- Loaded and deployed the application image into Kubernetes.
-- Configured Redis and Flask using Kubernetes Deployments and Services.
-- Exposed the application through a Kubernetes NodePort Service.
-- Enabled Metrics Server to monitor CPU and memory utilization.
-- Successfully demonstrated Kubernetes self-healing through automatic Pod recreation.
-- Configured Horizontal Pod Autoscaling using CPU utilization.
-- Demonstrated automatic scaling from two to six replicas.
-- Demonstrated automatic scale-down after removing the generated workload.
+| Technique | Demonstrated Result |
+|---|---|
+| Lightweight Docker base image | Image reduced by ≈59.5% |
+| Reduced CPU allocation | CPU requests and limits reduced by 50% |
+| Reduced memory allocation | Memory requests and limits reduced by 50% |
+| HPA | Dynamic scaling from 2 to 6 replicas |
 
-## 12. Future Improvements
+> The project was tested locally using Minikube. These results represent measured image-size and resource-configuration improvements, not actual cloud billing reductions.
 
-The project can be extended with the following improvements:
+---
 
-1. **Cloud Deployment:** Deploy the application on managed Kubernetes services such as Amazon EKS, Azure AKS, or Google GKE.
+# 📸 Screenshots & Evidence
 
-2. **Advanced Monitoring:** Integrate Prometheus and Grafana to monitor application performance and Kubernetes resource utilization.
+The `screenshots/` directory contains evidence of the project's implementation and testing.
 
-3. **Load Balancing:** Improve traffic distribution across multiple application replicas.
+Evidence includes:
 
-4. **Persistent Redis Storage:** Configure persistent storage to retain visitor count data across Redis container restarts.
+- Minikube cluster setup
+- Kubernetes system pods
+- Docker image creation
+- Redis deployment
+- Application deployment
+- Visitor counter running in the browser
+- Self-healing pod replacement
+- HPA configuration
+- CPU load generation
+- Autoscaling from 2 to 6 replicas
+- Scale-down after load stops
+- Primary and secondary cluster setup
+- Failover demonstration
+- Secondary application accessibility
+- Optimized image build
+- Resource optimization configuration
 
-5. **CI/CD Integration:** Implement automated build, testing, and deployment pipelines using GitHub Actions.
+---
 
-6. **Resource Optimization:** Optimize CPU and memory allocation to improve application efficiency and reduce infrastructure costs.
+# 📊 Results
 
-## 13. Conclusion
+The project successfully demonstrated:
 
-The Visitor Counter Application demonstrates the practical implementation of Docker and Kubernetes for deploying and managing containerized applications.
+- Flask visitor counter application deployment.
+- Redis integration.
+- Docker containerization.
+- Docker Compose execution.
+- Kubernetes deployment and service exposure.
+- Kubernetes self-healing.
+- Horizontal Pod Autoscaling.
+- CPU-based scale-up and scale-down.
+- Primary and secondary cluster simulation.
+- Failover application accessibility.
+- Docker image size optimization.
+- Kubernetes CPU and memory resource optimization.
 
-Flask handles the application logic, Redis stores visitor information, Docker provides containerization, and Kubernetes manages application deployment and orchestration.
+---
 
-The project successfully demonstrates two important Kubernetes capabilities: self-healing and Horizontal Pod Autoscaling.
+# ⚠️ Limitations
 
-The self-healing mechanism automatically replaces deleted Pods, while HPA adjusts the number of application replicas based on CPU utilization.
+- Kubernetes clusters were deployed locally using Minikube.
+- Hybrid failover was simulated locally rather than across actual cloud providers.
+- No actual cloud billing data was collected.
+- Cost optimization is evaluated through resource configuration and image-size measurements.
+- Production-grade networking, persistent storage, security, monitoring, and cross-region disaster recovery are outside the scope of this prototype.
 
-Overall, this project provides practical experience in containerization, orchestration, service management, resource monitoring, fault recovery, and automatic scaling.
+---
+
+# 🔮 Future Scope
+
+The project can be extended with:
+
+- Deployment to AWS, Azure, or Google Cloud.
+- Real multi-cloud or cross-region failover.
+- Persistent Redis storage.
+- CI/CD pipelines using GitHub Actions.
+- Prometheus and Grafana monitoring.
+- Ingress and domain-based access.
+- Kubernetes secrets and security hardening.
+- Infrastructure as Code using Terraform.
+- Automated disaster recovery workflows.
+- Cloud cost monitoring and real billing comparisons.
+
+---
+
+# 👨‍💻 Author
+
+**Akarsh Kumar**  
+B.Tech – Computer Science & Engineering  
+Batch: 3CSE2  
+Roll No.: 2410030259
+
+Cloud Computing Internal Assessment Project
+
+---
+
+## 📄 Project Submission
+
+This repository contains the source code, Docker configuration, Kubernetes manifests, architecture diagram, screenshots, and project documentation required to demonstrate the implementation.
+
+---
+
+⭐ If you find this project useful for learning Docker and Kubernetes, feel free to explore the repository.
+
 
 ---
 
